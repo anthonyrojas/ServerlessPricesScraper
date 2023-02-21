@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { PipelineStageStack } from '../lib/PipelineStageStack';
+import { PipelineStageStack } from '../lib/stacks/PipelineStageStack';
 
 const app = new cdk.App();
 new PipelineStageStack(app, 'ServerlessPriceScraperPipelineStack', {

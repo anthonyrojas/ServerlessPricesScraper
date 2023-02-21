@@ -124,7 +124,7 @@ export class ComputeStack extends Stack {
         props.eventRule.addTarget(new LambdaTarget(this.queueProductUrls));
 
         this.scrapePrices = new DockerImageFunction(this, 'ScrapePrices', {
-            code: DockerImageCode.fromImageAsset(path.join(__dirname, "../../")),
+            code: DockerImageCode.fromImageAsset(path.join(__dirname, "../../src/scrape-price/")),
             memorySize: 1024,
             timeout: Duration.minutes(3)
         });

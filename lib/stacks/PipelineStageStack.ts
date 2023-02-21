@@ -1,10 +1,10 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { ApiStack } from './stacks/ApiStack';
-import { AuthStack } from './stacks/AuthStack';
-import { ComputeStack } from './stacks/ComputeStack';
-import { DatabaseStack } from './stacks/DatabaseStack';
-import { MessagingStack } from './stacks/MessagingStack';
+import { ApiStack } from './ApiStack';
+import { AuthStack } from './AuthStack';
+import { ComputeStack } from './ComputeStack';
+import { DatabaseStack } from './DatabaseStack';
+import { MessagingStack } from './MessagingStack';
 
 export class PipelineStageStack extends cdk.Stack {
   private readonly STACK_NAME_PREFIX = "ServerlessScraper";
@@ -18,8 +18,7 @@ export class PipelineStageStack extends cdk.Stack {
       productQueue: messagingStack.productQueue,
       eventRule: messagingStack.eventRule
     });
-    computeStack.addDependency(databaseStack);
-    computeStack.addDependency(messagingStack);
+    computeStack.dependencies.push(messagingStack, computeStack);
     const authStack = new AuthStack(this, `${this.STACK_NAME_PREFIX}AuthStack`);
     const apiStack = new ApiStack(this, `${this.STACK_NAME_PREFIX}ApiStack`, {
       createProduct: computeStack.createProduct,

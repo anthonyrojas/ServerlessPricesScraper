@@ -22,9 +22,10 @@ export class AuthStack extends Stack {
         super(scope, id, props);
         this.userPool = new UserPool(this, "ScraperUserPool", {
             removalPolicy: RemovalPolicy.DESTROY,
-            selfSignUpEnabled: true,
             signInAliases: {
-                preferredUsername: true
+                preferredUsername: true,
+                username: true,
+                email: true
             },
             autoVerify: {
                 email: true
@@ -32,6 +33,7 @@ export class AuthStack extends Stack {
             passwordPolicy: {
                 minLength: 6
             },
+            selfSignUpEnabled: true,
             standardAttributes: {
                 givenName: {
                     mutable: true,
@@ -52,6 +54,10 @@ export class AuthStack extends Stack {
                 birthdate: {
                     mutable: false,
                     required: true
+                },
+                phoneNumber: {
+                    mutable: false,
+                    required: false
                 }
             },
             email: UserPoolEmail.withCognito(),
