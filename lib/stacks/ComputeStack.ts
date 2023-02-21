@@ -16,8 +16,14 @@ import {
     Function,
     Runtime
 } from "aws-cdk-lib/aws-lambda";
-import { Rule } from "aws-cdk-lib/aws-events";
-import { Queue } from "aws-cdk-lib/aws-sqs";
+import {
+    Queue,
+    QueueEncryption
+} from 'aws-cdk-lib/aws-sqs';
+import {
+    Rule,
+    Schedule
+} from 'aws-cdk-lib/aws-events';
 import { Table } from "aws-cdk-lib/aws-dynamodb";
 import * as path from 'path'
 
@@ -25,11 +31,11 @@ import * as path from 'path'
 interface ComputeStackProps extends StackProps {
     productsTable: Table;
     pricesTable: Table;
-    eventRule: Rule;
-    productQueue: Queue;
 }
 
 export class ComputeStack extends Stack {
+    public readonly eventRule: Rule;
+    public readonly productQueue: Queue;
     public readonly getProducts: NodejsFunction;
     public readonly getProductUrls: NodejsFunction;
     public readonly getProductPrices: NodejsFunction;
@@ -37,11 +43,19 @@ export class ComputeStack extends Stack {
     public readonly createProduct: NodejsFunction;
     public readonly createProductUrl: NodejsFunction;
     public readonly deleteProductUrl: NodejsFunction;
-    public readonly scrapePrices: Function
+    public readonly scrapePrices: Function;
     constructor(scope: Construct, id: string, props: ComputeStackProps) {
         super(scope, id, props);
         const productsTableName: string = props.productsTable.tableName;
         const pricesTableName: string = props.pricesTable.tableName;
+        this.eventRule = new Rule(this, "ScheduledProductUrlsRule", {
+            schedule: Schedule.rate(Duration.hours(1)),
+        });
+
+        this.productQueue = new Queue(this, "ProductUrlsQueue", {
+            fifo: true,
+            encryption: QueueEncryption.KMS_MANAGED
+        });
         this.getProducts = new NodejsFunction(this, "GetProducts", {
             entry: path.join(__dirname, "/../../src/get-product/index.ts"),
             handler: 'handler',
@@ -80,7 +94,7 @@ export class ComputeStack extends Stack {
             handler: 'handler',
             environment: {
                 PRICES_TABLE_NAME: pricesTableName,
-                QUEUE_URL: props.productQueue.queueUrl
+                QUEUE_URL: this.productQueue.queueUrl
             },
             runtime: Runtime.NODEJS_18_X,
             memorySize: 256,
@@ -119,9 +133,9 @@ export class ComputeStack extends Stack {
             memorySize: 256,
             timeout: Duration.seconds(15)
         });
-        this.addPermissions(props.productsTable, props.pricesTable, props.productQueue);
+        this.addPermissions(props.productsTable, props.pricesTable, this.productQueue);
         // add queue lambda as event target
-        props.eventRule.addTarget(new LambdaTarget(this.queueProductUrls));
+        this.eventRule.addTarget(new LambdaTarget(this.queueProductUrls));
 
         this.scrapePrices = new DockerImageFunction(this, 'ScrapePrices', {
             code: DockerImageCode.fromImageAsset(path.join(__dirname, "../../src/scrape-price/")),
