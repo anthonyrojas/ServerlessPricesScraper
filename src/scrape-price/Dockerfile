@@ -12,18 +12,9 @@ COPY install-chrome.sh /tmp/
 # Install chromium, chrome-driver
 RUN /usr/bin/bash /tmp/install.sh
 
-# Install npm packages and build
-RUN npm run install
-RUN npm run build
-
-# # Install Python dependencies for function
+# Install Python dependencies for function
 RUN pip install --upgrade pip -q
 RUN pip install -r /tmp/requirements.txt -q
-
-# Remove unused packages
-
-# COPY app.py /var/task/
-# CMD [ "app.lambda_handler" ]
 
 # Execute function
 COPY main.py /var/task/
