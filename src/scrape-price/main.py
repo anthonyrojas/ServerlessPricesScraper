@@ -57,7 +57,7 @@ def generate_user_agent() -> str:
     return ua.random
 
 
-def save_price(ddb: client, product_url_id: str, price: float):
+def save_price(ddb, product_url_id: str, price: float):
     price_timestamp = datetime.now().timestamp()
     now = datetime.now() + timedelta.days(30)
     ddb.put_item(
@@ -69,6 +69,7 @@ def save_price(ddb: client, product_url_id: str, price: float):
             "expirationTimestamp": TypeSerializer.serialize(int(now.timestamp()))
         }
     )
+    return
 
 
 def lambda_handler(event: SQSEvent, context):
@@ -85,6 +86,8 @@ def lambda_handler(event: SQSEvent, context):
         price = find_price(browser, xpath)
         save_price(ddb, product_url_id, price)
     ddb.close()
+    browser.close()
+    return
 
 
 

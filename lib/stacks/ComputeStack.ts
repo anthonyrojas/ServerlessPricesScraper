@@ -1,16 +1,20 @@
 import { Construct } from "constructs";
-import { 
+import {
+    Duration,
     Stack,
     StackProps
 } from "aws-cdk-lib";
 import {
     LambdaFunction as LambdaTarget
 } from 'aws-cdk-lib/aws-events-targets'
-import { 
-    NodejsFunction 
+import {
+    NodejsFunction
 } from "aws-cdk-lib/aws-lambda-nodejs";
-import { 
-    Runtime 
+import {
+    DockerImageCode,
+    DockerImageFunction,
+    Function,
+    Runtime
 } from "aws-cdk-lib/aws-lambda";
 import { Rule } from "aws-cdk-lib/aws-events";
 import { Queue } from "aws-cdk-lib/aws-sqs";
@@ -33,76 +37,97 @@ export class ComputeStack extends Stack {
     public readonly createProduct: NodejsFunction;
     public readonly createProductUrl: NodejsFunction;
     public readonly deleteProductUrl: NodejsFunction;
+    public readonly scrapePrices: Function
     constructor(scope: Construct, id: string, props: ComputeStackProps) {
         super(scope, id, props);
         const productsTableName: string = props.productsTable.tableName;
         const pricesTableName: string = props.pricesTable.tableName;
         this.getProducts = new NodejsFunction(this, "GetProducts", {
-            entry: path.join(__dirname, "/../src/get-product/index.ts"),
+            entry: path.join(__dirname, "/../../src/get-product/index.ts"),
             handler: 'handler',
             environment: {
                 PRODUCTS_TABLE_NAME: productsTableName,
-                PRICES_TABLE_NAME: pricesTableName 
+                PRICES_TABLE_NAME: pricesTableName
             },
-            runtime: Runtime.NODEJS_18_X
+            runtime: Runtime.NODEJS_18_X,
+            memorySize: 256,
+            timeout: Duration.seconds(15)
         });
         this.getProductUrls = new NodejsFunction(this, "GetProductUrls", {
-            entry: path.join(__dirname, "/../src/get-product-url/index.ts"),
+            entry: path.join(__dirname, "/../../src/get-product-url/index.ts"),
             handler: 'handler',
             environment: {
                 PRODUCTS_TABLE_NAME: productsTableName,
-                PRICES_TABLE_NAME: pricesTableName 
+                PRICES_TABLE_NAME: pricesTableName
             },
-            runtime: Runtime.NODEJS_18_X
+            runtime: Runtime.NODEJS_18_X,
+            memorySize: 256,
+            timeout: Duration.seconds(15)
         });
         this.getProductPrices = new NodejsFunction(this, "GetProductPrices", {
-            entry: path.join(__dirname, "/../src/get-product-prices/index.ts"),
+            entry: path.join(__dirname, "/../../src/get-product-prices/index.ts"),
             handler: 'handler',
             environment: {
                 PRODUCTS_TABLE_NAME: productsTableName,
-                PRICES_TABLE_NAME: pricesTableName 
+                PRICES_TABLE_NAME: pricesTableName
             },
-            runtime: Runtime.NODEJS_18_X
+            runtime: Runtime.NODEJS_18_X,
+            memorySize: 256,
+            timeout: Duration.seconds(15)
         });
         this.queueProductUrls = new NodejsFunction(this, "QueueProductUrls", {
-            entry: path.join(__dirname, "/../src/queue-product-urls/index.ts"),
+            entry: path.join(__dirname, "/../../src/queue-product-urls/index.ts"),
             handler: 'handler',
             environment: {
                 PRICES_TABLE_NAME: pricesTableName,
                 QUEUE_URL: props.productQueue.queueUrl
             },
-            runtime: Runtime.NODEJS_18_X
+            runtime: Runtime.NODEJS_18_X,
+            memorySize: 256,
+            timeout: Duration.seconds(15)
         });
         this.createProduct = new NodejsFunction(this, "CreateProduct", {
-            entry: path.join(__dirname, "/../src/create-product/index.ts"),
+            entry: path.join(__dirname, "/../../src/create-product/index.ts"),
             handler: 'handler',
             environment: {
                 PRODUCTS_TABLE_NAME: productsTableName,
-                PRICES_TABLE_NAME: pricesTableName 
+                PRICES_TABLE_NAME: pricesTableName
             },
-            runtime: Runtime.NODEJS_18_X
+            runtime: Runtime.NODEJS_18_X,
+            memorySize: 256,
+            timeout: Duration.seconds(15)
         });
         this.createProductUrl = new NodejsFunction(this, "CreateProductUrl", {
-            entry: path.join(__dirname, "/../src/create-product-url/index.ts"),
+            entry: path.join(__dirname, "/../../src/create-product-url/index.ts"),
             handler: 'handler',
             environment: {
                 PRODUCTS_TABLE_NAME: productsTableName,
-                PRICES_TABLE_NAME: pricesTableName 
+                PRICES_TABLE_NAME: pricesTableName
             },
-            runtime: Runtime.NODEJS_18_X
+            runtime: Runtime.NODEJS_18_X,
+            memorySize: 256,
+            timeout: Duration.seconds(15)
         });
         this.deleteProductUrl = new NodejsFunction(this, "DeleteProductUrl", {
-            entry: path.join(__dirname, "/../src/delete-product-url/index.ts"),
+            entry: path.join(__dirname, "/../../src/delete-product-url/index.ts"),
             handler: 'handler',
             environment: {
                 PRODUCTS_TABLE_NAME: productsTableName,
-                PRICES_TABLE_NAME: pricesTableName 
+                PRICES_TABLE_NAME: pricesTableName
             },
-            runtime: Runtime.NODEJS_18_X
+            runtime: Runtime.NODEJS_18_X,
+            memorySize: 256,
+            timeout: Duration.seconds(15)
         });
         this.addPermissions(props.productsTable, props.pricesTable, props.productQueue);
         // add queue lambda as event target
         props.eventRule.addTarget(new LambdaTarget(this.queueProductUrls));
+
+        this.scrapePrices = new DockerImageFunction(this, 'ScrapePrices', {
+            code: DockerImageCode.fromImageAsset(path.join(__dirname, "../../")),
+            memorySize: 1024,
+            timeout: Duration.minutes(3)
+        });
     }
 
     private addPermissions(
