@@ -49,7 +49,10 @@ export class ComputeStack extends Stack {
         const productsTableName: string = props.productsTable.tableName;
         const pricesTableName: string = props.pricesTable.tableName;
         this.eventRule = new Rule(this, "ScheduledProductUrlsRule", {
-            schedule: Schedule.rate(Duration.hours(1)),
+            schedule: Schedule.cron({
+                hour: "1",
+                minute: "0"
+            }),
         });
 
         this.productQueue = new Queue(this, "ProductUrlsQueue", {
