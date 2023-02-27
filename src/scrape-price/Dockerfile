@@ -10,7 +10,7 @@ COPY requirements.txt /tmp/
 COPY install-chrome.sh /tmp/
 
 # Install chromium, chrome-driver
-RUN /usr/bin/bash /tmp/install.sh
+RUN /usr/bin/bash /tmp/install-chrome.sh
 
 # Install Python dependencies for function
 RUN pip install --upgrade pip -q
