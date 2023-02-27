@@ -14,7 +14,7 @@ export class DatabaseStack extends Stack {
     public readonly pricesTable: Table;
     constructor(scope: Construct, id: string, props?: StackProps) {
         super(scope, id, props);
-        this.productsTable = new Table(scope, "TsScraperProducts", {
+        this.productsTable = new Table(this, "TsScraperProducts", {
             partitionKey: {
                 name: "pk",
                 type: AttributeType.STRING
@@ -25,7 +25,7 @@ export class DatabaseStack extends Stack {
             },
             billingMode: BillingMode.PAY_PER_REQUEST
         });
-        this.pricesTable = new Table(scope, "TsScraperPrices", {
+        this.pricesTable = new Table(this, "TsScraperPrices", {
             partitionKey: {
                 name: "pk",
                 type: AttributeType.STRING

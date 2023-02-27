@@ -7,7 +7,7 @@ import { DatabaseStack } from './DatabaseStack';
 
 export class PipelineStageStack extends cdk.Stage {
   private readonly STACK_NAME_PREFIX = "ServerlessScraper";
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props?: cdk.StageProps) {
     super(scope, id, props);
     const databaseStack = new DatabaseStack(this, `${this.STACK_NAME_PREFIX}DatabaseStack`);
     const computeStack = new ComputeStack(this, `${this.STACK_NAME_PREFIX}ComputeStack`, {
