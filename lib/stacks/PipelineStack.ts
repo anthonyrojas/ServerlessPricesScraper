@@ -17,8 +17,8 @@ export class PipelineStack extends cdk.Stack {
                     authentication: SecretValue.secretsManager("serverless-scraper-github-token"),
                 }),
                 commands: [
-                    "npm ci",
                     "npm install",
+                    "npm ci",
                     "npm run build",
                     "npx cdk synth"
                 ],
@@ -27,6 +27,10 @@ export class PipelineStack extends cdk.Stack {
             dockerEnabledForSelfMutation: true,
             dockerEnabledForSynth: true
         });
-        pipeline.addStage(new PipelineStageStack(this, "ProdStage", {}))
+        pipeline.addStage(new PipelineStageStack(this, "ProdStage", {
+            env: {
+                region: process.env.AWS_REGION ?? "us-west-1"
+            }
+        }))
     }
 }
