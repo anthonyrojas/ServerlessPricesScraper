@@ -1,5 +1,5 @@
 import { Construct } from "constructs";
-import { 
+import {
     Stack,
     StackProps
 } from "aws-cdk-lib";
@@ -26,7 +26,7 @@ interface ApiStackProps extends StackProps {
 }
 
 export class ApiStack extends Stack {
-    private readonly JSON_CONTENT_TYPE="application/json";
+    private readonly JSON_CONTENT_TYPE = "application/json";
     constructor(scope: Construct, id: string, props: ApiStackProps) {
         super(scope, id, props);
         const api = new RestApi(this, "ScraperRestApi", {
@@ -63,7 +63,7 @@ export class ApiStack extends Stack {
                 burstLimit: 100
             },
             quota: {
-                limit: 2500, 
+                limit: 2500,
                 period: Period.MONTH
             },
             apiStages: [

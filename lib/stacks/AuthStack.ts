@@ -23,8 +23,6 @@ export class AuthStack extends Stack {
         this.userPool = new UserPool(this, "ScraperUserPool", {
             removalPolicy: RemovalPolicy.DESTROY,
             signInAliases: {
-                preferredUsername: true,
-                username: true,
                 email: true
             },
             autoVerify: {
@@ -41,10 +39,6 @@ export class AuthStack extends Stack {
                 },
                 familyName: {
                     mutable: true,
-                    required: true
-                },
-                preferredUsername: {
-                    mutable: false,
                     required: true
                 },
                 email: {
