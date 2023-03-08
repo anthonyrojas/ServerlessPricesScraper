@@ -26,6 +26,7 @@ import {
 } from 'aws-cdk-lib/aws-events';
 import { Table } from "aws-cdk-lib/aws-dynamodb";
 import * as path from 'path'
+import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 
 
 interface ComputeStackProps extends StackProps {
@@ -145,6 +146,10 @@ export class ComputeStack extends Stack {
             memorySize: 1024,
             timeout: Duration.minutes(3)
         });
+
+        this.scrapePrices.addEventSource(new SqsEventSource(this.productQueue, {
+            batchSize: 1
+        }))
     }
 
     private addPermissions(
