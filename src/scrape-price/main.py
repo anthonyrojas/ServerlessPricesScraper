@@ -38,7 +38,7 @@ def create_chrome_options(ua_str: str) -> ChromeOptions:
     chrome_options.add_argument("--single-process")
     chrome_options.add_argument("--user-data-dir=/tmp/chromium")
     chrome_options.add_argument(f"user-agent={ua_str}")
-    chrome_options.binary_location = '/opt/chromium/chrome'
+    # chrome_options.binary_location = '/opt/chromium/chrome-linux'
     return chrome_options
 
 
