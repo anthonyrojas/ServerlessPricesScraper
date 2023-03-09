@@ -148,7 +148,8 @@ export class ComputeStack extends Stack {
         });
 
         this.scrapePrices.addEventSource(new SqsEventSource(this.productQueue, {
-            batchSize: 1
+            batchSize: 1,
+            maxBatchingWindow: Duration.minutes(3)
         }))
     }
 
