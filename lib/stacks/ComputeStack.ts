@@ -11,6 +11,7 @@ import {
     NodejsFunction
 } from "aws-cdk-lib/aws-lambda-nodejs";
 import {
+    Architecture,
     DockerImageCode,
     DockerImageFunction,
     Function,
@@ -144,7 +145,8 @@ export class ComputeStack extends Stack {
         this.scrapePrices = new DockerImageFunction(this, 'ScrapePrices', {
             code: DockerImageCode.fromImageAsset(path.join(__dirname, "/../../src/scrape-price/")),
             memorySize: 1024,
-            timeout: Duration.minutes(3)
+            timeout: Duration.minutes(3),
+            architecture: Architecture.X86_64
         });
 
         this.scrapePrices.addEventSource(new SqsEventSource(this.productQueue, {

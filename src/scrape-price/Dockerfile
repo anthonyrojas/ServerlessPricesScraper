@@ -1,9 +1,10 @@
 FROM public.ecr.aws/lambda/python:3.9
 
 # Install chrome dependecies
-RUN yum install unzip atk at-spi2-atk gtk3 cups-libs pango libdrm \
-    libXcomposite libXcursor libXdamage libXext libXtst libXt \
-    libXrandr libXScrnSaver alsa-lib -y
+RUN yum install xz atk cups-libs gtk3 libXcomposite alsa-lib tar \
+    libXcursor libXdamage libXext libXi libXrandr libXScrnSaver \
+    libXtst pango at-spi2-atk libXt xorg-x11-server-Xvfb \
+    xorg-x11-xauth dbus-glib dbus-glib-devel unzip bzip2 -y -q
 
 # Copy install scripts
 COPY requirements.txt /tmp/

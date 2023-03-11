@@ -36,8 +36,9 @@ def create_chrome_options(ua_str: str) -> ChromeOptions:
     chrome_options.add_argument("--disable-dev-tools")
     chrome_options.add_argument("--no-zygote")
     chrome_options.add_argument("--single-process")
+    chrome_options.add_argument("window-size=2560x1440")
     chrome_options.add_argument("--user-data-dir=/tmp/chromium")
-    chrome_options.add_argument(f"user-agent={ua_str}")
+    chrome_options.add_argument("--remote-debugging-port=9222")
     chrome_options.binary_location = '/opt/chromium/chrome'
     return chrome_options
 
@@ -72,13 +73,13 @@ def save_price(ddb, product_url_id: str, price: float):
     return
 
 
-def lambda_handler(event: SQSEvent, context):
+def lambda_handler(event: dict, context):
     ua_str = generate_user_agent()
     chrome_options = create_chrome_options(ua_str)
     browser = create_browser(chrome_options)
     ddb = boto3.client("dynamodb", region_name=os.getenv("AWS_REGION"))
-    for record in event.Records:
-        event_body = json.loads(record.body)
+    for record in event["Records"]:
+        event_body = json.loads(record["body"])
         product_url = event_body["productUrl"]
         product_url_id = event_body["productUrlId"]
         xpath = event_body["xpath"]
