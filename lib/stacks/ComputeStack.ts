@@ -59,7 +59,8 @@ export class ComputeStack extends Stack {
 
         this.productQueue = new Queue(this, "ProductUrlsQueue", {
             fifo: false,
-            encryption: QueueEncryption.KMS_MANAGED
+            encryption: QueueEncryption.KMS_MANAGED,
+            visibilityTimeout: Duration.minutes(5)
         });
         this.getProducts = new NodejsFunction(this, "GetProducts", {
             entry: path.join(__dirname, "/../../src/get-product/index.ts"),
