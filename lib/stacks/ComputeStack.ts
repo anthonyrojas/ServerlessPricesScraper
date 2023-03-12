@@ -58,7 +58,7 @@ export class ComputeStack extends Stack {
         });
 
         this.productQueue = new Queue(this, "ProductUrlsQueue", {
-            fifo: true,
+            fifo: false,
             encryption: QueueEncryption.KMS_MANAGED
         });
         this.getProducts = new NodejsFunction(this, "GetProducts", {
