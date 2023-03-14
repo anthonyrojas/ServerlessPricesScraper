@@ -15,6 +15,7 @@ deserializer = TypeDeserializer()
 
 
 def find_price(browser: webdriver.Chrome, xpath: str) -> float:
+    browser.implicitly_wait(15)
     price_element: WebElement = browser.find_element(By.XPATH, xpath)
     price_extract = price_element.text
     # strip extra characters and parse text to number
