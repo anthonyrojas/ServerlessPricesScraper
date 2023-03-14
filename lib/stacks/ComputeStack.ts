@@ -19,7 +19,7 @@ import {
 } from "aws-cdk-lib/aws-lambda";
 import {
     Queue,
-    QueueEncryption
+    QueueEncryption,
 } from 'aws-cdk-lib/aws-sqs';
 import {
     Rule,
@@ -58,7 +58,6 @@ export class ComputeStack extends Stack {
         });
 
         this.productQueue = new Queue(this, "ProductUrlsQueue", {
-            fifo: undefined,
             encryption: QueueEncryption.KMS_MANAGED,
             visibilityTimeout: Duration.minutes(5)
         });
