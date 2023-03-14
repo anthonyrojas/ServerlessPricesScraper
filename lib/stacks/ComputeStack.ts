@@ -58,7 +58,6 @@ export class ComputeStack extends Stack {
         });
 
         this.productQueue = new Queue(this, "ProductUrlsQueue", {
-            fifo: false,
             encryption: QueueEncryption.KMS_MANAGED,
             visibilityTimeout: Duration.minutes(5)
         });
