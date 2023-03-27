@@ -145,7 +145,7 @@ export class ComputeStack extends Stack {
         this.scrapePrices = new DockerImageFunction(this, 'ScrapePrices', {
             code: DockerImageCode.fromImageAsset(path.join(__dirname, "/../../src/scrape-price/")),
             memorySize: 1024,
-            timeout: Duration.minutes(3),
+            timeout: Duration.minutes(5),
             architecture: Architecture.X86_64
         });
 
